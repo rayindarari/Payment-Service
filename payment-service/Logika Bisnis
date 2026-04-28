@@ -1,0 +1,13 @@
+class PaymentProcessor:
+    @staticmethod
+    def process_gateway(amount: float, method: str):
+        # Simulasi integrasi ke pihak ketiga (Midtrans/Stripe)
+        if amount > 10000000:
+            return "high_risk"
+        return "authorized"
+
+    @staticmethod
+    def calculate_fee(amount: float):
+        # Simulasi potongan admin/fee
+        fee = amount * 0.02
+        return fee
