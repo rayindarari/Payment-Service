@@ -1,0 +1,26 @@
+from fastapi import FastAPI, Depends, HTTPException
+from models import PaymentCreate, PaymentResponse
+from services import PaymentProcessor
+import uuid
+
+app = FastAPI()
+
+@app.post("/payments", response_model=PaymentResponse)
+async def create_transaction(payment: PaymentCreate):
+    # 1. Panggil logika bisnis dari services.py
+    risk_status = PaymentProcessor.process_gateway(payment.amount, payment.method)
+    
+    if risk_status == "high_risk":
+        raise HTTPException(status_code=403, detail="Pembayaran melebihi limit aman")
+
+    # 2. Hitung biaya admin
+    admin_fee = PaymentProcessor.calculate_fee(payment.amount)
+    
+    # 3. Simpan ke database (simulasi)
+    transaction = {
+        "id": str(uuid.uuid4()),
+        **payment.dict(),
+        "status": "pending",
+        "fee": admin_fee
+    }
+    return transaction
